@@ -257,7 +257,30 @@ function App() {
 
     const endedCleanup = audioPlayer.onEnded(() => {
       setIsPlaying(false);
-      handleNextTrack();
+      // Directly handle next track without function dependency
+      if (playQueue.length === 0) return;
+
+      let nextIndex;
+      if (repeatMode === 'one') {
+        nextIndex = currentTrackIndex;
+      } else if (isShuffled) {
+        nextIndex = Math.floor(Math.random() * playQueue.length);
+      } else if (repeatMode === 'all' && currentTrackIndex === playQueue.length - 1) {
+        nextIndex = 0;
+      } else if (currentTrackIndex < playQueue.length - 1) {
+        nextIndex = currentTrackIndex + 1;
+      } else {
+        return;
+      }
+
+      const nextTrack = playQueue[nextIndex];
+      if (nextTrack) {
+        // Inline play logic to avoid dependency issues
+        setCurrentTrack(nextTrack);
+        setCurrentTrackIndex(nextIndex);
+        setIsPlaying(true);
+        audioPlayer.play(nextTrack).catch(console.error);
+      }
     });
 
     const errorCleanup = audioPlayer.onError(() => {
@@ -277,7 +300,7 @@ function App() {
     if (recentTracks.length > 0 && playQueue.length === 0) {
       setPlayQueue([...recentTracks]);
     }
-  }, [recentTracks]);
+  }, [recentTracks, playQueue.length]);
 
   // Set volume on audio player
   useEffect(() => {
@@ -291,27 +314,15 @@ function App() {
 
   // Handle login
   const handleLogin = async () => {
-    console.log('Login button clicked!'); // Debug log
     try {
       if (typeof qortalRequest !== 'undefined') {
-        console.log('Using QORTAL API');
         const response = await qortalRequest({
           action: 'GET_USER_ACCOUNT'
         });
         
         if (response?.name) {
-          const userToSet = { name: response.name };
-          setCurrentUser(userToSet);
-          console.log(`User logged in: ${userToSet.name}`);
-        } else {
-          console.log('No user name in response:', response);
+          setCurrentUser({ name: response.name });
         }
-      } else {
-        // Mock login for development
-        console.log('Using mock login');
-        const userToSet = { name: 'TestUser' };
-        setCurrentUser(userToSet);
-        console.log(`Mock login: ${userToSet.name}`);
       }
     } catch (error) {
       console.error('Login error:', error);
