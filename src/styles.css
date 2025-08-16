@@ -489,6 +489,21 @@ body {
   padding: 10px 20px;
 }
 
+/* Special styling for home page audio cards */
+.home-audio-card {
+  min-width: 180px;
+  max-width: 180px;
+  flex: 0 0 180px;
+}
+
+@media (max-width: 768px) {
+  .home-audio-card {
+    min-width: 150px;
+    max-width: 150px;
+    flex: 0 0 150px;
+  }
+}
+
 /* Add Music Form styles */
 .add-music-container {
   max-width: 600px;

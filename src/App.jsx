@@ -359,6 +359,7 @@ function App() {
                               audio={track}
                               isPlaying={isPlaying && currentTrack?.id === track.id}
                               onPlay={handlePlayTrack}
+                              className="home-audio-card"
                             />
                           ))
                         )}

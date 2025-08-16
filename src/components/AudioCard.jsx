@@ -1,4 +1,4 @@
-const AudioCard = ({ audio, isPlaying, onPlay }) => {
+const AudioCard = ({ audio, isPlaying, onPlay, className = '' }) => {
   const { title, artist, uploader, thumbnail } = audio;
 
   const handleImageError = (e) => {
@@ -7,7 +7,7 @@ const AudioCard = ({ audio, isPlaying, onPlay }) => {
   };
 
   return (
-    <div className={`audio-card ${isPlaying ? 'playing' : ''}`} onClick={() => onPlay(audio)}>
+    <div className={`audio-card ${isPlaying ? 'playing' : ''} ${className}`} onClick={() => onPlay(audio)}>
       <div className="audio-card-image">
         {thumbnail ? (
           <>
