@@ -16,8 +16,8 @@ export const fetchRecentAudioFiles = async (limit = 20, offset = 0) => {
     const response = await qortalRequest({
       action: "SEARCH_QDN_RESOURCES",
       service: "AUDIO",
-      query: "qmusic_",
-      limit: limit * 2,
+      query: "", // Tühi string otsib kõiki audio faile
+      limit: limit * 2, // Küsime rohkem, et peale filtreerimist jääks piisav kogus alles
       offset: offset,
       reverse: true,
       includeMetadata: true,
@@ -34,8 +34,14 @@ export const fetchRecentAudioFiles = async (limit = 20, offset = 0) => {
       const isMusic = track.identifier && (
         track.identifier.startsWith('qmusic_') || 
         track.identifier.startsWith('earbump_song_') ||
-        track.identifier.startsWith('qaudio_qblog_')
+        track.identifier.startsWith('qaudio_qblog_') ||
+        // Lisame täiendavad audioformaadid, et leida rohkem laule
+        track.identifier.endsWith('.mp3') ||
+        track.identifier.endsWith('.wav') ||
+        track.identifier.endsWith('.ogg') ||
+        track.identifier.endsWith('.m4a')
       );
+      
       if (isMusic) {
         console.log(`Found music track: ${track.name} with identifier: ${track.identifier}`);
       }

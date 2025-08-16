@@ -319,6 +319,24 @@ body {
   overflow-y: auto;
 }
 
+/* Common elements */
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.loading-message, .error-message, .empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: #9ba1a9;
+  font-size: 1.2rem;
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
 /* Header stiilid */
 .header {
   background-color: #282828;
