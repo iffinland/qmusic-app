@@ -38,11 +38,43 @@
   font-weight: bold;
 }
 
+/* Songs grid layout */
 .songs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
   padding: 20px 0;
+}
+
+/* Extra layouts for different page types */
+.songs-grid-compact {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
+}
+
+.songs-grid-large {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+/* Responsive grid adjustments */
+@media (min-width: 1200px) {
+  .songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (min-width: 1600px) {
+  .songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
 }
 
 /* Pagination styles */
