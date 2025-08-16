@@ -66,6 +66,9 @@ const AllSongs = ({ onPlay }) => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [songsPerPage] = useState(25);
+  
+  // Platform filter state
+  const [platformFilter, setPlatformFilter] = useState('All');
 
   useEffect(() => {
     loadSongs();
@@ -166,11 +169,30 @@ const AllSongs = ({ onPlay }) => {
   // Reset to page 1 when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedLetter]);
+  }, [selectedLetter, platformFilter]);
 
+  // Filter songs by platform first
+  const platformFilteredSongs = songs.filter(song => {
+    if (platformFilter === 'All') return true;
+    
+    if (platformFilter === 'Q-Music') {
+      return song.identifier && (
+        song.identifier.startsWith('qmusic_track_') ||
+        song.identifier.startsWith('qmusic_song_')
+      );
+    }
+    
+    if (platformFilter === 'Ear Bump') {
+      return song.identifier && song.identifier.startsWith('earbump_song_');
+    }
+    
+    return true;
+  });
+
+  // Then filter by letter
   const filteredSongs = selectedLetter === 'All' 
-    ? songs 
-    : songs.filter(song => {
+    ? platformFilteredSongs 
+    : platformFilteredSongs.filter(song => {
         // Get the first letter to filter by
         let firstChar;
 
@@ -227,6 +249,29 @@ const AllSongs = ({ onPlay }) => {
     <div className="all-songs-container">
       <h1 className="page-title">All Songs</h1>
       
+      {/* Platform filter */}
+      <div className="platform-filter">
+        <button
+          className={`platform-button ${platformFilter === 'All' ? 'active' : ''}`}
+          onClick={() => setPlatformFilter('All')}
+        >
+          All Platforms
+        </button>
+        <button
+          className={`platform-button q-music ${platformFilter === 'Q-Music' ? 'active' : ''}`}
+          onClick={() => setPlatformFilter('Q-Music')}
+        >
+          Q-Music Only
+        </button>
+        <button
+          className={`platform-button ear-bump ${platformFilter === 'Ear Bump' ? 'active' : ''}`}
+          onClick={() => setPlatformFilter('Ear Bump')}
+        >
+          Ear Bump Only
+        </button>
+      </div>
+      
+      {/* Alphabet filter */}
       <div className="alphabet-filter">
         {alphabet.map((letter) => (
           <button
@@ -313,6 +358,7 @@ const AllSongs = ({ onPlay }) => {
           
           <div className="pagination-info">
             Showing {indexOfFirstSong + 1}-{Math.min(indexOfLastSong, filteredSongs.length)} of {filteredSongs.length} songs
+            {platformFilter !== 'All' && ` (${platformFilter} only)`}
           </div>
         </>
       )}

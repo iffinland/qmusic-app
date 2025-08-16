@@ -4,6 +4,52 @@
   flex: 1;
 }
 
+/* Platform filter styles */
+.platform-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.platform-button {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.platform-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.platform-button.active {
+  background: #4A90E2;
+  font-weight: bold;
+}
+
+/* Style for platform-specific buttons */
+.platform-button.q-music {
+  border-left: 4px solid #4CAF50;
+}
+
+.platform-button.q-music.active {
+  background: #4CAF50;
+}
+
+.platform-button.ear-bump {
+  border-left: 4px solid #F44336;
+}
+
+.platform-button.ear-bump.active {
+  background: #F44336;
+}
+
+/* Alphabet filter styles */
 .alphabet-filter {
   display: flex;
   flex-wrap: wrap;
@@ -147,6 +193,11 @@
 }
 
 @media (max-width: 768px) {
+  .songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
   .pagination {
     flex-direction: column;
     gap: 10px;
@@ -155,5 +206,15 @@
   .page-numbers {
     flex-wrap: wrap;
     justify-content: center;
+  }
+  
+  .platform-filter {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .platform-button {
+    padding: 8px 12px;
+    text-align: center;
   }
 }
