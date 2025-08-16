@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { AppBar, Toolbar, Button, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
 
 const HeaderContainer = styled(AppBar)`
@@ -18,6 +19,11 @@ const Logo = styled(Link)`
   align-items: center;
 `;
 
+const LogoImage = styled.img`
+  height: 30px;
+  margin-right: 10px;
+`;
+
 const NavMenu = styled.nav`
   margin: 0 auto;
   display: flex;
@@ -32,17 +38,51 @@ const NavLink = styled(Link)`
   }
 `;
 
-const Header = () => {
+const SearchContainer = styled.div`
+  margin-left: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+const SearchInput = styled.input`
+  background-color: #282828;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 36px 8px 16px;
+  color: white;
+  &::placeholder {
+    color: #aaa;
+  }
+`;
+
+const SearchIconWrapper = styled(IconButton)`
+  position: absolute;
+  right: 4px;
+  color: #aaa;
+`;
+
+const Header = ({ onToggleSidebar }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <HeaderContainer>
       <Toolbar>
+        <IconButton 
+          color="inherit" 
+          edge="start" 
+          onClick={onToggleSidebar}
+          sx={{ mr: 2 }}
+        >
+          <MenuIcon />
+        </IconButton>
         <Logo to="/">
+          <LogoImage src="/qmusic.png" alt="Q-Music" />
           qmusic
         </Logo>
         <NavMenu>
-          <NavLink to="/browse">Browse Songs</NavLink>
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/all-songs">All Songs</NavLink>
           <NavLink to="/playlists">All Playlists</NavLink>
           {isAuthenticated && (
             <>
@@ -51,9 +91,12 @@ const Header = () => {
             </>
           )}
         </NavMenu>
-        <IconButton color="inherit">
-          <SearchIcon />
-        </IconButton>
+        <SearchContainer>
+          <SearchInput placeholder="Search songs..." />
+          <SearchIconWrapper size="small">
+            <SearchIcon fontSize="small" />
+          </SearchIconWrapper>
+        </SearchContainer>
         <Button color="inherit" onClick={() => setIsAuthenticated(!isAuthenticated)}>
           {isAuthenticated ? 'Logout' : 'Login'}
         </Button>

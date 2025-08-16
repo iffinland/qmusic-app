@@ -3,10 +3,12 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchRecentAudioFiles, getAudioMetadata, getThumbnailUrl } from './services/qdnService';
+import AllSongs from './components/AllSongs';
 import audioPlayer from './services/audioPlayerService';
 import AudioCard from './components/AudioCard';
 import AddMusicForm from './components/AddMusicForm';
 import UploadSongForm from './components/UploadSongForm';
+import Header from './components/Header';
 import './styles.css';
 
 // Helper function to extract title from identifier
@@ -247,25 +249,65 @@ function App() {
 
   // Handle login
   const handleLogin = async () => {
-    if (typeof qortalRequest !== 'undefined') {
-      try {
-        const response = await qortalRequest({
-          action: 'GET_USER_ACCOUNT'
-        });
-        
-        if (response?.name) {
-          const userToSet = { name: response.name };
-          setCurrentUser(userToSet);
-          console.log(`User logged in: ${userToSet.name}`);
-        }
-      } catch (error) {
-        console.error('Login failed:', error);
+    console.log('Login button clicked!');
+    
+    if (typeof qortalRequest === 'undefined') {
+      console.log('ERROR: QORTAL API not available - are you using QORTAL browser?');
+      alert('Login requires QORTAL browser!');
+      return;
+    }
+
+    try {
+      // First get the current user account
+      console.log('Getting user account...');
+      const accountResponse = await qortalRequest({
+        action: 'GET_USER_ACCOUNT'
+      });
+      console.log('Account response:', accountResponse);
+
+      if (!accountResponse || !accountResponse.address) {
+        console.log('No account received');
+        alert('Login failed: Could not get user account. Are you logged into QORTAL?');
+        return;
       }
-    } else {
-      // Mock login for development
-      const userToSet = { name: 'TestUser' };
-      setCurrentUser(userToSet);
-      console.log(`Mock login: ${userToSet.name}`);
+
+      // Then get the name for this account
+      console.log('Getting names for address:', accountResponse.address);
+      const namesResponse = await qortalRequest({
+        action: 'GET_ACCOUNT_NAMES',
+        address: accountResponse.address,
+        limit: 20,
+        offset: 0,
+        reverse: false
+      });
+      console.log('Names response:', namesResponse);
+
+      if (Array.isArray(namesResponse) && namesResponse.length > 0) {
+        const userToSet = { 
+          name: namesResponse[0].name,
+          address: accountResponse.address 
+        };
+        setCurrentUser(userToSet);
+        console.log(`Success! Logged in as: ${userToSet.name}`);
+      } else {
+        console.log('No names found for address');
+        // If no name, use address as fallback
+        const userToSet = { 
+          name: accountResponse.address,
+          address: accountResponse.address 
+        };
+        setCurrentUser(userToSet);
+        console.log(`Logged in with address: ${accountResponse.address}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        toString: error.toString()
+      });
+      alert('Login error: ' + (error.message || error.toString() || 'Unknown error'));
     }
   };
 
@@ -294,39 +336,11 @@ function App() {
     <Router>
       <div className="app">
         <div className="app-container">
-          <header className="header">
-            <div className="header-content">
-              <div className="header-left">
-                <button
-                  className="hamburger-menu"
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                >
-                  ☰
-                </button>
-              </div>
-              
-              <div className="header-center">
-                <div className="search-container">
-                  <input 
-                    type="text" 
-                    placeholder="Search songs, artists..." 
-                    className="search-input"
-                  />
-                  <button className="search-button">🔍</button>
-                </div>
-              </div>
-              
-              <div className="header-right">
-                <div className="logo">
-                  <img src="/qmusic.png" alt="Q-Music" />
-                </div>
-              </div>
-            </div>
-          </header>
-          
+          <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
           <main className="main-content">
             <div className="content-area">
               <Routes>
+                <Route path="/all-songs" element={<AllSongs onPlay={handlePlayTrack} />} />
                 <Route path="/" element={
                   <div className="home-container">
                     <section className="section">
@@ -375,13 +389,36 @@ function App() {
                     <span className="user-name">{currentUser.name}</span>
                   </div>
                 ) : (
-                  <button className="sidebar-login-button" onClick={handleLogin}>
+                  <button 
+                    className="sidebar-login-button" 
+                    onClick={(e) => {
+                      console.log('Raw button click event:', e);
+                      handleLogin();
+                    }}
+                    style={{ position: 'relative', zIndex: 1000 }}
+                  >
                     🔐 Login
                   </button>
                 )}
               </div>
               
               <nav className="side-menu">
+                <div className="menu-section">
+                  <h3>Navigation</h3>
+                  <Link to="/" className="sidebar-link">
+                    <span className="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                  </Link>
+                  <Link to="/all-songs" className="sidebar-link">
+                    <span className="sidebar-icon">🎵</span>
+                    <span>All Songs</span>
+                  </Link>
+                  <Link to="/playlists" className="sidebar-link">
+                    <span className="sidebar-icon">📑</span>
+                    <span>All Playlists</span>
+                  </Link>
+                </div>
+
                 {currentUser && (
                   <div className="menu-section publish-section">
                     <h3>Actions</h3>

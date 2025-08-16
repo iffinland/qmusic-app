@@ -32,9 +32,9 @@ body {
   padding: 20px;
   background-color: #121212;
   overflow-y: auto;
-  margin-top: 70px; /* Header height */
+  margin-top: 64px; /* Updated header height */
   margin-bottom: 100px; /* Player height */
-  min-height: calc(100vh - 170px); /* Full height minus header and player */
+  min-height: calc(100vh - 164px); /* Full height minus header and player */
 }
 
 @media (max-width: 768px) {
@@ -74,17 +74,44 @@ body {
 
 /* Header styles */
 .header {
-  background-color: #2c3444; /* Softened dark blue */
-  padding: 1rem;
-  height: 70px;
-  border-bottom: 1px solid #3d4557;
-  position: fixed;
+  background: #1e2430;
+  padding: 0.5rem 1rem;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;  /* Standardne header kõrgus */
+}
+
+.header-left {
   display: flex;
   align-items: center;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Mobile header adjustments */
@@ -138,6 +165,11 @@ body {
   margin-left: 10px;
 }
 
+.logo img {
+  height: 40px;
+  width: auto;
+}
+
 .logo-letter {
   font-size: 2rem;
   font-weight: bold;
@@ -184,13 +216,14 @@ body {
 }
 
 .search-input {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 20px;
   border: none;
   background-color: #3e3e3e;
   color: white;
-  width: 300px;
+  width: 250px;
   text-align: center;
+  font-size: 14px;
 }
 
 .search-button {

@@ -3,56 +3,30 @@
 // QDN API endpoints
 const BASE_URL = '/arbitrary';
 
-// Mock data for development
-const MOCK_TRACKS = [
-  {
-    name: 'TestUser1',
-    service: 'AUDIO',
-    identifier: 'qmusic_song_john_doe_hello_world_ABC123',
-    created: Date.now() - 3600000,
-    size: 5000000
-  },
-  {
-    name: 'TestUser2', 
-    service: 'AUDIO',
-    identifier: 'qmusic_track_amazing_grace_DEF456',
-    created: Date.now() - 7200000,
-    size: 4500000
-  },
-  {
-    name: 'iffi',
-    service: 'AUDIO', 
-    identifier: 'qmusic_song_iffi_vaba_mees_mashupmix201980s_GHI789',
-    created: Date.now() - 1800000,
-    size: 6000000
-  }
-];
-
 export const fetchRecentAudioFiles = async (limit = 20, offset = 0) => {
   try {
     console.log(`Fetching audio files with limit=${limit}, offset=${offset}`);
     
-    // Check if we're in Qortal environment
     if (typeof qortalRequest === 'undefined') {
-      console.log('Development mode - using mock data');
-      return MOCK_TRACKS.slice(offset, offset + limit);
+      console.error('Qortal API not available');
+      return [];
     }
     
-    // Use Earbump's fetch method instead of qortalRequest
-    const url = `/arbitrary/resources/search?mode=ALL&service=AUDIO&query=qmusic_&limit=${limit * 2}&includemetadata=true&offset=${offset}&reverse=true&excludeblocked=true&includestatus=true`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    // Use Qortal API to fetch songs
+    const response = await qortalRequest({
+      action: "SEARCH_QDN_RESOURCES",
+      service: "AUDIO",
+      query: "qmusic_",
+      limit: limit * 2,
+      offset: offset,
+      reverse: true,
+      includeMetadata: true,
+      excludeBlocked: true,
+      includeStatus: true
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const audioFiles = await response.json();
+    // Qortal API vastus on juba JSON kujul
+    const audioFiles = response;
     console.log(`Raw API response: ${audioFiles.length} total audio files`);
     
     // Filter to include music tracks only
