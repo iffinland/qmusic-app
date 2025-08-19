@@ -7,6 +7,8 @@ import audioPlayer from './services/audioPlayerService';
 import AudioCard from './components/AudioCard';
 import AddMusicForm from './components/AddMusicForm';
 import UploadSongForm from './components/UploadSongForm';
+import Header from './components/Header';
+import { getUserAccount } from './utils/qortalRequest';
 import './styles.css';
 
 // Helper function to extract title from identifier
@@ -81,12 +83,13 @@ function App() {
   const [recentTracks, setRecentTracks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // Audio player state
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [loginError, setLoginError] = useState(null);
+  const isAuthenticated = !!currentUser;
 
   // Load recent tracks
   const loadRecentTracks = useCallback(async () => {
@@ -247,26 +250,24 @@ function App() {
 
   // Handle login
   const handleLogin = async () => {
-    if (typeof qortalRequest !== 'undefined') {
-      try {
-        const response = await qortalRequest({
-          action: 'GET_USER_ACCOUNT'
-        });
-        
-        if (response?.name) {
-          const userToSet = { name: response.name };
-          setCurrentUser(userToSet);
-          console.log(`User logged in: ${userToSet.name}`);
-        }
-      } catch (error) {
-        console.error('Login failed:', error);
+    setLoginError(null);
+    try {
+      const account = await getUserAccount();
+      if (account?.address) {
+        const userToSet = { name: account.name || account.address, address: account.address };
+        setCurrentUser(userToSet);
+      } else {
+        setLoginError('Konto aadressi ei leitud.');
       }
-    } else {
-      // Mock login for development
-      const userToSet = { name: 'TestUser' };
-      setCurrentUser(userToSet);
-      console.log(`Mock login: ${userToSet.name}`);
+    } catch (error) {
+      setLoginError('Sisselogimine ebaõnnestus: ' + (error.message || error));
+      setCurrentUser({ name: 'TestUser' });
     }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setLoginError(null);
   };
 
   const handlePlayTrack = (track) => {
@@ -294,35 +295,11 @@ function App() {
     <Router>
       <div className="app">
         <div className="app-container">
-          <header className="header">
-            <div className="header-content">
-              <div className="header-left">
-                <button
-                  className="hamburger-menu"
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                >
-                  ☰
-                </button>
-              </div>
-              
-              <div className="header-center">
-                <div className="search-container">
-                  <input 
-                    type="text" 
-                    placeholder="Search songs, artists..." 
-                    className="search-input"
-                  />
-                  <button className="search-button">🔍</button>
-                </div>
-              </div>
-              
-              <div className="header-right">
-                <div className="logo">
-                  <img src="/qmusic.png" alt="Q-Music" />
-                </div>
-              </div>
-            </div>
-          </header>
+          <Header 
+            isAuthenticated={isAuthenticated} 
+            onLogin={handleLogin} 
+            onLogout={handleLogout} 
+          />
           
           <main className="main-content">
             <div className="content-area">
@@ -368,6 +345,7 @@ function App() {
           <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
             <div className="sidebar-content">
               {/* User Section */}
+
               <div className="user-section">
                 {currentUser ? (
                   <div className="user-info">
@@ -375,9 +353,16 @@ function App() {
                     <span className="user-name">{currentUser.name}</span>
                   </div>
                 ) : (
-                  <button className="sidebar-login-button" onClick={handleLogin}>
-                    🔐 Login
-                  </button>
+                  <>
+                    <button className="sidebar-login-button" onClick={handleLogin}>
+                      🔐 Login
+                    </button>
+                    {loginError && (
+                      <div className="error-message" style={{marginTop: '10px', color: 'red', fontWeight: 'bold'}}>
+                        {loginError}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               

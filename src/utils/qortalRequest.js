@@ -13,6 +13,12 @@ export const qortalRequest = async (params) => {
     }
 };
 
+// Get user account (returns address and other info)
+export const getUserAccount = async () => {
+    return await qortalRequest({ action: 'GET_USER_ACCOUNT' });
+};
+
+
 // Get base URL for resources
 export const getResourceUrl = (service, name, identifier) => {
     return `/arbitrary/${service}/${encodeURIComponent(name)}/${encodeURIComponent(identifier)}`;

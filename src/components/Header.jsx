@@ -32,9 +32,7 @@ const NavLink = styled(Link)`
   }
 `;
 
-const Header = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+const Header = ({ isAuthenticated, onLogin, onLogout }) => {
   return (
     <HeaderContainer>
       <Toolbar>
@@ -54,9 +52,15 @@ const Header = () => {
         <IconButton color="inherit">
           <SearchIcon />
         </IconButton>
-        <Button color="inherit" onClick={() => setIsAuthenticated(!isAuthenticated)}>
-          {isAuthenticated ? 'Logout' : 'Login'}
-        </Button>
+        {isAuthenticated ? (
+          <Button color="inherit" onClick={onLogout}>
+            Logout
+          </Button>
+        ) : (
+          <Button color="inherit" onClick={onLogin}>
+            Login
+          </Button>
+        )}
       </Toolbar>
     </HeaderContainer>
   );
